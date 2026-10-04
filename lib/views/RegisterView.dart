@@ -1,18 +1,86 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:recetario_dam_mry/RegisterView.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
+class RegisterView extends StatefulWidget {
 
-class LoginView extends StatefulWidget {
   @override
-  State<LoginView> createState() => _LoginViewState();
+  State<RegisterView> createState() => _RegisterViewState();
 }
 
-class _LoginViewState extends State<LoginView> {
+
+class _RegisterViewState extends State<RegisterView> {
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final repeatPasswordController = TextEditingController();
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    repeatPasswordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> funClickRegistro() async {
+    if (repeatPasswordController.text != passwordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Las contraseñas no coinciden"),
+        ),
+      );
+      return;
+    }
+
+    try {
+      final credential =
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text,
+      );
+
+      if (!mounted) return;
+
+      if (credential.user != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Cuenta creada correctamente"),
+          ),
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+
+      debugPrint('Error de registro: ${e.code}');
+      debugPrint('Detalle: ${e.message}');
+
+      String mensaje = "${e.code}: ${e.message}";
+
+      if (e.code == 'weak-password') {
+        mensaje = "La contraseña es demasiado débil";
+      } else if (e.code == 'email-already-in-use') {
+        mensaje = "Ya existe una cuenta con ese correo";
+      } else if (e.code == 'invalid-email') {
+        mensaje = "El correo electrónico no es válido";
+      } else if (e.code == 'network-request-failed') {
+        mensaje = "Comprueba tu conexión a Internet";
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(mensaje)),
+      );
+    } catch (e){
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Ha ocurrido un error inesperado")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-
-
-
     return Scaffold(
       backgroundColor: const Color(0xFFFFF7ED),
       appBar: AppBar(
@@ -39,7 +107,7 @@ class _LoginViewState extends State<LoginView> {
             const SizedBox(height: 24),
 
             const Text(
-              "Bienvenido de nuevo",
+              "Crea tu cuenta",
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 28,
@@ -97,6 +165,20 @@ class _LoginViewState extends State<LoginView> {
 
             const SizedBox(height: 24),
 
+            TextField(
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: "Repetir contraseña",
+                prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF9A3412)),
+                filled: true,
+                fillColor: const Color(0xFFFFF7ED),
+                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFFED7AA))),
+                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF9A3412), width: 2))
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF9A3412),
@@ -105,19 +187,8 @@ class _LoginViewState extends State<LoginView> {
                 elevation: 0,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              onPressed: () {},
-              child: const Text("Iniciar sesión"),
-            ),
-
-            TextButton(
-              style: TextButton.styleFrom(foregroundColor: const Color(0xFF9A3412)),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => RegisterView()), // Cambia por el nombre de tu vista
-                );
-              },
-              child: const Text("¿No tienes cuenta? Regístrate", textAlign: TextAlign.center),
+              onPressed: funClickRegistro,
+              child: const Text("Crear cuenta"),
             ),
           ],
         ),

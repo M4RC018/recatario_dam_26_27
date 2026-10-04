@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:recetario_dam_mry/views/RegisterView.dart';
 
-class RegisterView extends StatefulWidget {
+
+class LoginView extends StatefulWidget {
   @override
-  State<RegisterView> createState() => _RegisterViewState();
+  State<LoginView> createState() => _LoginViewState();
 }
 
-class _RegisterViewState extends State<RegisterView> {
+class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
+
+
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFF7ED),
       appBar: AppBar(
@@ -34,7 +39,7 @@ class _RegisterViewState extends State<RegisterView> {
             const SizedBox(height: 24),
 
             const Text(
-              "Crea tu cuenta",
+              "Bienvenido de nuevo",
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 28,
@@ -92,20 +97,6 @@ class _RegisterViewState extends State<RegisterView> {
 
             const SizedBox(height: 24),
 
-            TextField(
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: "Repetir contraseña",
-                prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF9A3412)),
-                filled: true,
-                fillColor: const Color(0xFFFFF7ED),
-                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFFED7AA))),
-                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF9A3412), width: 2))
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF9A3412),
@@ -115,13 +106,18 @@ class _RegisterViewState extends State<RegisterView> {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               onPressed: () {},
-              child: const Text("Crear cuenta"),
+              child: const Text("Iniciar sesión"),
             ),
 
             TextButton(
               style: TextButton.styleFrom(foregroundColor: const Color(0xFF9A3412)),
-              onPressed: () {},
-              child: const Text("¿Ya tienes cuenta? Inicia sesión", textAlign: TextAlign.center),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => RegisterView()), // Cambia por el nombre de tu vista
+                );
+              },
+              child: const Text("¿No tienes cuenta? Regístrate", textAlign: TextAlign.center),
             ),
           ],
         ),
