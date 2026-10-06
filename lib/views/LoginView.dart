@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:recetario_dam_mry/views/RegisterView.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 
 class LoginView extends StatefulWidget {
@@ -8,6 +11,78 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  bool entrando = false;
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+
+  Future<void> funClickLogin() async {
+    if (entrando) return;
+    if (emailController.text.trim().isEmpty || passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Introduce correo y contraseña')),
+      );
+      return;
+    }
+    setState(() => entrando = true);
+    try {
+      final credential =
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text,
+      );
+
+      final usuario = credential.user;
+
+      if (usuario != null) {
+        final documento = await FirebaseFirestore.instance
+            .collection('perfil')
+            .doc(usuario.uid)
+            .get();
+        if (!mounted) return;
+        if(documento.exists){
+          Navigator.pushReplacementNamed(context, "/HomeView");
+        } else {
+          Navigator.pushReplacementNamed(context, '/RegisterView', arguments: true);
+        }
+      }
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("No se ha podido iniciar sesión"),
+        ),
+      );
+
+      debugPrint("Error de login: ${e.code}");
+    } on FirebaseException catch (e) {
+      debugPrint('Error de Firestore: ${e.code}: ${e.message}');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.code == 'permission-denied'
+            ? 'Firestore no permite leer el perfil. Revisa sus reglas.'
+            : 'No se ha podido consultar el perfil. Inténtalo de nuevo.')),
+      );
+    } catch (e) {
+      debugPrint('Error de login: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Ha ocurrido un error al iniciar sesión')),
+      );
+    } finally {
+      if (mounted) setState(() => entrando = false);
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
 
@@ -51,6 +126,7 @@ class _LoginViewState extends State<LoginView> {
             const SizedBox(height: 28),
 
             TextField(
+              controller: emailController,
               decoration: InputDecoration(
                 labelText: "Usuario",
                 prefixIcon: const Icon(Icons.person),
@@ -74,6 +150,7 @@ class _LoginViewState extends State<LoginView> {
             const SizedBox(height: 16),
 
             TextField(
+              controller: passwordController,
               obscureText: true,
               decoration: InputDecoration(
                 labelText: "Contraseña",
@@ -105,8 +182,8 @@ class _LoginViewState extends State<LoginView> {
                 elevation: 0,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              onPressed: () {},
-              child: const Text("Iniciar sesión"),
+              onPressed: entrando ? null : funClickLogin,
+              child: Text(entrando ? 'Entrando...' : 'Iniciar sesión'),
             ),
 
             TextButton(

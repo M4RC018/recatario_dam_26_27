@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RegisterView extends StatefulWidget {
+  const RegisterView({super.key, this.completarPerfil = false});
+  final bool completarPerfil;
 
 
   @override
@@ -10,7 +12,7 @@ class RegisterView extends StatefulWidget {
 }
 
 class _RegisterViewState extends State<RegisterView> {
-  final db = FirebaseFirestore.instance;
+  final nombreController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final repeatPasswordController = TextEditingController();
@@ -18,13 +20,46 @@ class _RegisterViewState extends State<RegisterView> {
 
   @override
   void dispose() {
+    nombreController.dispose();
     emailController.dispose();
     passwordController.dispose();
     repeatPasswordController.dispose();
     super.dispose();
   }
 
-  final usuario = FirebaseAuth.instance.currentUser;
+  Future<void> funGuardarPerfil() async {
+    if (registrando) return;
+    final usuario = FirebaseAuth.instance.currentUser;
+    if (usuario == null) {
+      Navigator.pushReplacementNamed(context, '/LoginView');
+      return;
+    }
+    if (nombreController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Introduce tu nombre')),
+      );
+      return;
+    }
+    setState(() => registrando = true);
+    try {
+      await FirebaseFirestore.instance.collection('perfil').doc(usuario.uid).set({
+        'Nombre': nombreController.text.trim(),
+        'correo': usuario.email,
+      }, SetOptions(merge: true));
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, '/HomeView');
+    } on FirebaseException catch (e) {
+      debugPrint('Error al guardar perfil: ${e.code}: ${e.message}');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.code == 'permission-denied'
+            ? 'Firestore no permite guardar el perfil. Revisa sus reglas.'
+            : 'No se ha podido guardar el perfil. Inténtalo de nuevo.')),
+      );
+    } finally {
+      if (mounted) setState(() => registrando = false);
+    }
+  }
 
   Future<void> funClickRegistro() async {
     if (registrando) return;
@@ -103,15 +138,46 @@ class _RegisterViewState extends State<RegisterView> {
     } finally {
       if (mounted) setState(() => registrando = false);
     }
-    if(usuario == null){
-      debugPrint('No existe ese usuario');
-      return;
-    }
-    final document = await db.collection('perfil').doc(usuario?.uid).get();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (widget.completarPerfil) {
+      return Scaffold(
+        backgroundColor: const Color(0xFFFFF7ED),
+        appBar: AppBar(title: const Text('Completa tu perfil')),
+        body: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Text('Tu cuenta ya existe. Añade tu nombre para continuar.'),
+                  const SizedBox(height: 20),
+                  TextField(
+                    controller: nombreController,
+                    enabled: !registrando,
+                    decoration: const InputDecoration(labelText: 'Nombre'),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF9A3412),
+                      foregroundColor: Colors.white,
+                    ),
+                    onPressed: registrando ? null : funGuardarPerfil,
+                    child: Text(registrando ? 'Guardando...' : 'Guardar perfil'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
     return Scaffold(
       backgroundColor: const Color(0xFFFFF7ED),
       appBar: AppBar(
