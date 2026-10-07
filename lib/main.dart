@@ -4,8 +4,10 @@ import 'package:recetario_dam_mry/firebase_options.dart';
 import 'MiApp.dart';
 
 Future<void> main() async {
+  // Prepara Flutter antes de usar los plugins de Firebase.
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Esperamos la inicialización antes de mostrar cualquier pantalla.
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -13,6 +15,8 @@ Future<void> main() async {
   runApp(MiApp());
 }
 
+// Ejemplo del contador original. No es la aplicación que inicia main():
+// arriba se ejecuta MiApp. La prueba widget_test.dart aún usa este ejemplo.
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 

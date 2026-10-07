@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'DataHolder.dart';
 import 'Perfil.dart';
 
+/// Reutiliza la pantalla para crear la cuenta o completar nombre y edad.
+/// Separar estos formularios en ProfileView queda pendiente.
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key, this.completarPerfil = false});
   final bool completarPerfil;
@@ -19,16 +21,19 @@ class _RegisterViewState extends State<RegisterView> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final repeatPasswordController = TextEditingController();
+  // Controla el bloqueo de botones durante las operaciones asíncronas.
   bool registrando = false;
   late bool completandoPerfil;
 
   @override
   void initState() {
     super.initState();
+    // Solo se permite guardar un perfil si hay una sesión identificada.
     completandoPerfil = widget.completarPerfil &&
         FirebaseAuth.instance.currentUser != null;
     if (completandoPerfil) {
       final perfil = DataHolder.instance.perfilUsuario;
+      // Precargamos una sola vez para no borrar lo escrito al redibujar.
       if (perfil?.uid == FirebaseAuth.instance.currentUser?.uid) {
         nombreController.text = perfil?.nombre ?? '';
         edadController.text = perfil?.edad?.toString() ?? '';
@@ -38,6 +43,7 @@ class _RegisterViewState extends State<RegisterView> {
 
   @override
   void dispose() {
+    // Los controladores pertenecen a esta pantalla; liberamos sus recursos.
     nombreController.dispose();
     edadController.dispose();
     emailController.dispose();
@@ -46,6 +52,7 @@ class _RegisterViewState extends State<RegisterView> {
     super.dispose();
   }
 
+  /// Valida el formulario, guarda el objeto Perfil y abre Home al terminar.
   Future<void> funGuardarPerfil() async {
     if (registrando) return;
     final usuario = FirebaseAuth.instance.currentUser;
@@ -59,6 +66,7 @@ class _RegisterViewState extends State<RegisterView> {
       );
       return;
     }
+    // tryParse devuelve null si el texto no es un entero, sin lanzar un error.
     final edad = int.tryParse(edadController.text.trim());
     if (edad == null || edad <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -68,16 +76,20 @@ class _RegisterViewState extends State<RegisterView> {
     }
     setState(() => registrando = true);
     try {
-      await FirebaseFirestore.instance.collection('perfil').doc(usuario.uid).set({
-        'Nombre': nombreController.text.trim(),
-        'Edad': edad,
-        'correo': usuario.email,
-      }, SetOptions(merge: true));
-      DataHolder.instance.perfilUsuario = Perfil(
+      final perfil = Perfil(
         uid: usuario.uid,
         nombre: nombreController.text.trim(),
         edad: edad,
       );
+
+      // El conversor llama a toFirestore. merge conserva otros campos
+      // existentes, por ejemplo el correo de perfiles creados anteriormente.
+      await DataHolder.instance.perfiles
+          .doc(usuario.uid)
+          .set(perfil, SetOptions(merge: true));
+
+      // Actualizamos la copia compartida solo después de guardar correctamente.
+      DataHolder.instance.perfilUsuario = perfil;
       if (!mounted) return;
       Navigator.pushReplacementNamed(context, '/HomeView');
     } on FirebaseException catch (e) {
@@ -93,6 +105,7 @@ class _RegisterViewState extends State<RegisterView> {
     }
   }
 
+  /// Crea la cuenta en Authentication; el documento de perfil se guarda después.
   Future<void> funClickRegistro() async {
     if (registrando) return;
 
@@ -129,7 +142,8 @@ class _RegisterViewState extends State<RegisterView> {
       if (!mounted) return;
 
       if (credential.user != null) {
-        // La cuenta ya existe; ahora completamos sus datos personales.
+        // Firebase acaba de crear la cuenta y deja su sesión iniciada.
+        // Cambiamos de formulario sin crear otra cuenta ni otra pantalla.
         DataHolder.instance.perfilUsuario = Perfil(uid: credential.user!.uid);
         passwordController.clear();
         repeatPasswordController.clear();
@@ -179,6 +193,7 @@ class _RegisterViewState extends State<RegisterView> {
 
   @override
   Widget build(BuildContext context) {
+    // Este modo muestra nombre y edad. El otro muestra correo y contraseñas.
     if (completandoPerfil) {
       return Scaffold(
         backgroundColor: const Color(0xFFFFF7ED),

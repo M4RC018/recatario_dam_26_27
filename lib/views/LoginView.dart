@@ -25,7 +25,9 @@ class _LoginViewState extends State<LoginView> {
   }
 
 
+  /// Autentica la cuenta y decide si ir a Home o completar sus datos personales.
   Future<void> funClickLogin() async {
+    // Evita varias peticiones si se pulsa el botón mientras estamos esperando.
     if (entrando) return;
     if (emailController.text.trim().isEmpty || passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -44,20 +46,19 @@ class _LoginViewState extends State<LoginView> {
       final usuario = credential.user;
 
       if (usuario != null) {
+        // Evita conservar datos de otro usuario durante la consulta.
         DataHolder.instance.perfilUsuario = null;
-        final documento = await FirebaseFirestore.instance
-            .collection('perfil')
-            .doc(usuario.uid)
-            .get();
+        final documento = await DataHolder.instance.perfiles
+          .doc(usuario.uid)
+          .get();
         if (!mounted) return;
 
-        final datos = documento.data();
-
-        final perfil = datos != null
-          ?Perfil.fromMap(documento.id, datos)
-            : Perfil(uid: usuario.uid);
+        // withConverter ya devuelve un Perfil, no un Map.
+        // Si no existe el documento, creamos un objeto vacío para completarlo.
+        final perfil = documento.data() ?? Perfil(uid: usuario.uid);
 
         DataHolder.instance.perfilUsuario = perfil;
+        // No basta con que exista el documento: comprobamos sus campos.
         final tieneEdad = perfil.edad != null && perfil.edad! > 0;
         final tieneNombre = perfil.nombre?.trim().isNotEmpty ?? false;
 
@@ -68,34 +69,42 @@ class _LoginViewState extends State<LoginView> {
         }
       }
     } on FirebaseAuthException catch (e) {
+      // Primero el error específico de Authentication; los fallos al leer
+      // Firestore se tratan en el siguiente bloque FirebaseException.
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("No se ha podido iniciar sesión"),
-        ),
-      );
+      String mensaje = 'No se ha podido iniciar sesión';
 
-      debugPrint("Error de login: ${e.code}");
+      if (e.code == 'invalid-credential' ||
+          e.code == 'wrong-password' ||
+          e.code == 'user-not-found') {
+        mensaje = 'Correo o contraseña incorrectos';
+      } else if (e.code == 'invalid-email') {
+        mensaje = 'El correo electrónico no es válido';
+      } else if (e.code == 'network-request-failed') {
+        mensaje = 'Comprueba tu conexión a Internet';
+      } else if (e.code == 'too-many-requests') {
+        mensaje = 'Demasiados intentos. Prueba más tarde';
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(mensaje)),
+      );
+      debugPrint('Error de login: ${e.code}');
     } on FirebaseException catch (e) {
       debugPrint('Error de Firestore: ${e.code}: ${e.message}');
       if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.code == 'permission-denied'
-            ? 'Firestore no permite leer el perfil. Revisa sus reglas.'
+            ? 'No tienes permiso para consultar el perfil.'
             : 'No se ha podido consultar el perfil. Inténtalo de nuevo.')),
       );
-    } catch (e) {
-      debugPrint('Error de login: $e');
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ha ocurrido un error al iniciar sesión')),
-      );
     } finally {
+      // Se ejecuta tanto si funcionó como si hubo error. mounted comprueba
+      // que la pantalla sigue existiendo antes de actualizarla con setState.
       if (mounted) setState(() => entrando = false);
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -203,10 +212,7 @@ class _LoginViewState extends State<LoginView> {
             TextButton(
               style: TextButton.styleFrom(foregroundColor: const Color(0xFF9A3412)),
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => RegisterView()), // Cambia por el nombre de tu vista
-                );
+                Navigator.pushNamed(context, '/RegisterView');
               },
               child: const Text("¿No tienes cuenta? Regístrate", textAlign: TextAlign.center),
             ),
