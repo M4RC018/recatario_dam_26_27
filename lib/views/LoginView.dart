@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:recetario_dam_mry/views/RegisterView.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'Perfil.dart';
+import 'DataHolder.dart';
 
 
 
@@ -42,12 +44,24 @@ class _LoginViewState extends State<LoginView> {
       final usuario = credential.user;
 
       if (usuario != null) {
+        DataHolder.instance.perfilUsuario = null;
         final documento = await FirebaseFirestore.instance
             .collection('perfil')
             .doc(usuario.uid)
             .get();
         if (!mounted) return;
-        if(documento.exists){
+
+        final datos = documento.data();
+
+        final perfil = datos != null
+          ?Perfil.fromMap(documento.id, datos)
+            : Perfil(uid: usuario.uid);
+
+        DataHolder.instance.perfilUsuario = perfil;
+        final tieneEdad = perfil.edad != null && perfil.edad! > 0;
+        final tieneNombre = perfil.nombre?.trim().isNotEmpty ?? false;
+
+        if(documento.exists && tieneNombre&& tieneEdad){
           Navigator.pushReplacementNamed(context, "/HomeView");
         } else {
           Navigator.pushReplacementNamed(context, '/RegisterView', arguments: true);

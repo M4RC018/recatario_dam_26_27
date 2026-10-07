@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'DataHolder.dart';
+import 'Perfil.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key, this.completarPerfil = false});
@@ -13,14 +15,31 @@ class RegisterView extends StatefulWidget {
 
 class _RegisterViewState extends State<RegisterView> {
   final nombreController = TextEditingController();
+  final edadController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final repeatPasswordController = TextEditingController();
   bool registrando = false;
+  late bool completandoPerfil;
+
+  @override
+  void initState() {
+    super.initState();
+    completandoPerfil = widget.completarPerfil &&
+        FirebaseAuth.instance.currentUser != null;
+    if (completandoPerfil) {
+      final perfil = DataHolder.instance.perfilUsuario;
+      if (perfil?.uid == FirebaseAuth.instance.currentUser?.uid) {
+        nombreController.text = perfil?.nombre ?? '';
+        edadController.text = perfil?.edad?.toString() ?? '';
+      }
+    }
+  }
 
   @override
   void dispose() {
     nombreController.dispose();
+    edadController.dispose();
     emailController.dispose();
     passwordController.dispose();
     repeatPasswordController.dispose();
@@ -31,7 +50,7 @@ class _RegisterViewState extends State<RegisterView> {
     if (registrando) return;
     final usuario = FirebaseAuth.instance.currentUser;
     if (usuario == null) {
-      Navigator.pushReplacementNamed(context, '/LoginView');
+      setState(() => completandoPerfil = false);
       return;
     }
     if (nombreController.text.trim().isEmpty) {
@@ -40,12 +59,25 @@ class _RegisterViewState extends State<RegisterView> {
       );
       return;
     }
+    final edad = int.tryParse(edadController.text.trim());
+    if (edad == null || edad <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Introduce una edad válida')),
+      );
+      return;
+    }
     setState(() => registrando = true);
     try {
       await FirebaseFirestore.instance.collection('perfil').doc(usuario.uid).set({
         'Nombre': nombreController.text.trim(),
+        'Edad': edad,
         'correo': usuario.email,
       }, SetOptions(merge: true));
+      DataHolder.instance.perfilUsuario = Perfil(
+        uid: usuario.uid,
+        nombre: nombreController.text.trim(),
+        edad: edad,
+      );
       if (!mounted) return;
       Navigator.pushReplacementNamed(context, '/HomeView');
     } on FirebaseException catch (e) {
@@ -97,6 +129,11 @@ class _RegisterViewState extends State<RegisterView> {
       if (!mounted) return;
 
       if (credential.user != null) {
+        // La cuenta ya existe; ahora completamos sus datos personales.
+        DataHolder.instance.perfilUsuario = Perfil(uid: credential.user!.uid);
+        passwordController.clear();
+        repeatPasswordController.clear();
+        setState(() => completandoPerfil = true);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Cuenta creada correctamente")),
         );
@@ -142,7 +179,7 @@ class _RegisterViewState extends State<RegisterView> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.completarPerfil) {
+    if (completandoPerfil) {
       return Scaffold(
         backgroundColor: const Color(0xFFFFF7ED),
         appBar: AppBar(title: const Text('Completa tu perfil')),
@@ -155,12 +192,19 @@ class _RegisterViewState extends State<RegisterView> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text('Tu cuenta ya existe. Añade tu nombre para continuar.'),
+                  const Text('Completa tu nombre y edad para continuar.'),
                   const SizedBox(height: 20),
                   TextField(
                     controller: nombreController,
                     enabled: !registrando,
                     decoration: const InputDecoration(labelText: 'Nombre'),
+                  ),
+                  const SizedBox(height: 20),
+                  TextField(
+                    controller: edadController,
+                    enabled: !registrando,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(labelText: 'Edad'),
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
