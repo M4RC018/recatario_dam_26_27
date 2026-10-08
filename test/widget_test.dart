@@ -10,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:recetario_dam_mry/main.dart';
 
+// Prueba heredada del contador: no comprueba MiApp ni el flujo del recetario.
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.

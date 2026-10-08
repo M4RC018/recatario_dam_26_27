@@ -2,7 +2,7 @@
 
 Aplicación de recetas desarrollada con Flutter y Firebase para el proyecto de 2.º de DAM.
 
-**Estado documentado: 7 de octubre de 2026.** Proyecto en desarrollo. Actualmente implementa el acceso, el registro y el perfil del usuario; todavía no permite gestionar recetas. Entrega de la fase 1: 16 de octubre de 2026.
+**Estado documentado: 8 de octubre de 2026.** Proyecto en desarrollo. Actualmente implementa el acceso, el registro y el perfil del usuario; todavía no permite gestionar recetas. Entrega de la fase 1: 16 de octubre de 2026.
 
 ## 1. Tecnologías
 
@@ -22,12 +22,19 @@ lib/
   main.dart                 Inicializa Firebase y ejecuta MiApp.
   MiApp.dart                MaterialApp y rutas.
   firebase_options.dart     Configuración generada por FlutterFire.
+  DataHolder.dart           Perfil compartido y referencia con conversor.
+  Admins/                   Administradores de servicios (preparada).
+  FbObjects/
+    Perfil.dart             Modelo y conversiones de datos de Firestore.
+  insLib/                   Componentes y estilos reutilizables (preparada).
   views/
+    SplashView.dart         Imagen URL, progreso y recuperación del perfil.
+    ProfileView.dart        Reservada; formulario aún dentro del registro.
     LoginView.dart          Acceso y comprobación del perfil.
     RegisterView.dart       Registro y formulario de nombre y edad.
     HomeView.dart           Pantalla de bienvenida provisional.
-    Perfil.dart             Modelo y conversiones de datos.
-    DataHolder.dart         Perfil compartido y referencia con conversor.
+
+
 test/
   register_view_test.dart   Validaciones locales del registro.
   widget_test.dart          Prueba heredada del contador de Flutter.
@@ -35,7 +42,7 @@ android/, ios/, macos/, web/, windows/
                             Proyectos y configuración de plataformas.
 ```
 
-La separación lógica distingue interfaz, modelo y datos compartidos. La separación física exigida por el enunciado está pendiente: `Perfil.dart` debe pasar a una carpeta de modelos y `DataHolder.dart` a servicios o datos. Separar responsabilidades facilita entender y mantener el código. Las consultas todavía están dentro de las vistas.
+La estructura sigue el ejemplo de clase: `views` contiene las pantallas, `FbObjects` los modelos de Firestore y `DataHolder.dart` comparte los datos desde la raíz de `lib`. `Admins` está preparada para administradores de servicios e `insLib` para componentes y estilos reutilizables. Las carpetas preparadas incluyen `.gitkeep` para conservarlas en el repositorio. Las consultas todavía están dentro de las vistas; crear administradores de datos sigue pendiente.
 
 ## 3. Arranque en un equipo limpio
 
@@ -120,7 +127,7 @@ No deben subirse contraseñas, tokens de sesión, archivos de cuentas de servici
 ## 5. Flujo actual del usuario
 
 1. `main()` prepara Flutter, espera a `Firebase.initializeApp()` y ejecuta `MiApp`.
-2. La ruta inicial es `/LoginView`; todavía no hay splash ni comprobación inicial que redirija una sesión persistente.
+2. La ruta inicial es `/SplashView`. Muestra una imagen URL con carga y error, y cuatro pasos de espera simulada. Sin sesión abre el login; con sesión consulta el perfil y lo guarda en DataHolder antes de abrir Home. Ver las limitaciones del splash al final.
 3. El registro solicita correo, contraseña y repetición. Comprueba campos vacíos, formato de correo y coincidencia de contraseñas.
 4. Authentication crea la cuenta. La misma `RegisterView` pasa al modo de completar perfil.
 5. El formulario solicita nombre y edad. El nombre no puede quedar vacío y la edad debe ser un entero positivo.
@@ -159,6 +166,7 @@ El modelo y `toFirestore()` solo incluyen nombre y edad. El correo está disponi
 
 | Ruta | Pantalla | Parámetros |
 |---|---|---|
+| `/SplashView` | SplashView | Ninguno |
 | `/LoginView` | LoginView | Ninguno |
 | `/RegisterView` | RegisterView | `true` solicita completar perfil |
 | `/HomeView` | Homeview | Ninguno |
@@ -171,7 +179,7 @@ Los controladores de texto se liberan con `dispose()`. Las consultas actuales so
 
 El registro distingue correo usado, contraseña débil, correo inválido, problemas de red, proveedor deshabilitado y exceso de intentos. El login trata credenciales incorrectas, correo inválido, falta de conexión y demasiados intentos dentro de `FirebaseAuthException`. Los fallos de consulta del perfil se capturan por separado en `FirebaseException`. Esta separación se corrigió el 7 de octubre; falta verificar cada mensaje en la interfaz.
 
-El campo del login se llama visualmente «Usuario», aunque espera un correo. Home es provisional. En `main.dart` quedan las clases del contador original que no se ejecutan desde `runApp(MiApp())`; su prueba tampoco acredita el funcionamiento del recetario.
+El login muestra «Correo electrónico». Home es provisional y saluda con el nombre guardado en DataHolder, o con un texto genérico si no hay nombre. En `main.dart` quedan las clases del contador original que no se ejecutan desde `runApp(MiApp())`; su prueba tampoco acredita el funcionamiento del recetario.
 
 Problemas de arranque conocidos:
 
@@ -219,16 +227,17 @@ No marcar como correcto un caso que no se haya ejecutado. Anotar fecha, disposit
 | Perfil completo al entrar | Acceso a Home | Pendiente | Pendiente |
 | Nombre vacío / edad inválida | Validación sin guardar | Pendiente | Pendiente |
 | Cerrar sesión | Regreso a acceso y limpieza del perfil | Pendiente | Pendiente |
-| Splash y onboarding | Carga/error y primera ejecución | Sin implementar | Sin implementar |
+| Splash | Imagen URL, carga/error y recuperación de sesión | Pendiente | Implementado; recorrido completo pendiente |
+| Onboarding | Tres páginas, saltar y primera visita | Sin implementar | Sin implementar |
 | Lista y cuadrícula | Datos, carga, vacío y error | Sin implementar | Sin implementar |
 
 ## 10. Pendientes de fase 1
 
-- Separar carpetas de modelos, servicios y pantallas.
+- Completar la separación de servicios en `Admins`; los modelos ya están en `FbObjects` y las pantallas en `views`.
 - Verificar manualmente el recorrido con lectura y escritura tipadas ya conectadas.
 - Probar las rutas por nombre y los mensajes del login ya corregidos.
 - Comprobar cierre de sesión, limpieza del perfil y comportamiento de Atrás.
-- Splash con imagen URL, carga y error.
+- Verificar el splash con imagen URL, carga y error en Android y navegador; tratar errores al recuperar el perfil.
 - Onboarding de tres pantallas, omisión y persistencia de primera visita.
 - Colección de recetas y al menos seis documentos de prueba para el contenido.
 - Barra inferior con tres secciones, lista y cuadrícula desde Firestore y sus estados.
@@ -259,3 +268,29 @@ Esta documentación describe el estado intermedio; no sustituye el PDF de eviden
 7. `HomeView.dart`: cierre de sesión y limpieza del historial de navegación.
 
 Los comentarios explican el código de la app sin modificar sus operaciones. `firebase_options.dart` se mantiene como archivo generado por FlutterFire. El ejemplo del contador que permanece en main se identifica como código heredado, no como parte del flujo real.
+
+
+## 12. Avance del 8 de octubre
+
+- Estructura adaptada al profesor: FbObjects/Perfil.dart, DataHolder en lib, vistas en views y carpetas Admins e insLib preparadas. Todavía no tienen implementaciones de servicios o componentes.
+- Tema compartido y presentación de splash, perfil e inicio ajustados. El GIF actual es de Pixabay; no se sustituyó por Dash.
+- El splash comprueba la sesión y consulta el perfil con la referencia tipada. DataHolder vive en memoria y se vuelve a rellenar al arrancar.
+- El alumno confirmó que la sesión se conserva al detener y volver a ejecutar en navegador. No se aporta captura ni evidencia Android.
+- Para repetir la prueba web en el navegador habitual y con la misma dirección:
+
+```powershell
+flutter run -d web-server --web-port=8080
+```
+
+Abrir http://localhost:8080 en el mismo navegador y perfil. Iniciar sesión, detener con q, ejecutar el mismo comando y volver a esa dirección sin cerrar sesión.
+
+### Límites del arranque actual
+
+- La lectura del perfil en SplashView no captura errores de Firestore: si falla, todavía no ofrece recuperación.
+- Si no hay documento, abre RegisterView sin arguments: true, por lo que muestra crear cuenta. Debe pedir completar el perfil.
+- El splash comprueba que existe perfil, pero no valida nombre y edad como el login.
+- El progreso es simulado; el 100 % no implica que haya terminado la consulta del perfil o la descarga del GIF.
+- ProfileView sigue reservada y no está conectada a las rutas. Falta el onboarding de tres páginas.
+- La compilación web del 8 de octubre terminó correctamente antes de la última incorporación del alumno a la consulta del perfil. El control automatizado del navegador falló al iniciar; no se presenta como prueba visual superada.
+
+Validación tras actualizar comentarios y documentación: las dos pruebas de register_view_test.dart pasan; flutter analyze no detecta errores, pero informa 14 avisos de estilo e importaciones. La prueba antigua del contador sigue pendiente de resolver y no se ha repetido en este cierre.

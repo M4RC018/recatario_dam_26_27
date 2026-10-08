@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:recetario_dam_mry/views/RegisterView.dart';
 
+// Pruebas locales: validan el formulario sin crear cuentas ni conectar con Firebase.
 void main() {
   testWidgets('Valida campos vacíos antes de contactar con Firebase', (
     tester,

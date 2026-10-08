@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'DataHolder.dart';
-import 'Perfil.dart';
+
+import '../DataHolder.dart';
+import '../FbObjects/Perfil.dart';
 
 /// Reutiliza la pantalla para crear la cuenta o completar nombre y edad.
 /// Separar estos formularios en ProfileView queda pendiente.
@@ -10,12 +11,12 @@ class RegisterView extends StatefulWidget {
   const RegisterView({super.key, this.completarPerfil = false});
   final bool completarPerfil;
 
-
   @override
   State<RegisterView> createState() => _RegisterViewState();
 }
 
 class _RegisterViewState extends State<RegisterView> {
+  // Cada campo tiene un controlador propio, liberado en dispose().
   final nombreController = TextEditingController();
   final edadController = TextEditingController();
   final emailController = TextEditingController();
@@ -29,8 +30,8 @@ class _RegisterViewState extends State<RegisterView> {
   void initState() {
     super.initState();
     // Solo se permite guardar un perfil si hay una sesión identificada.
-    completandoPerfil = widget.completarPerfil &&
-        FirebaseAuth.instance.currentUser != null;
+    completandoPerfil =
+        widget.completarPerfil && FirebaseAuth.instance.currentUser != null;
     if (completandoPerfil) {
       final perfil = DataHolder.instance.perfilUsuario;
       // Precargamos una sola vez para no borrar lo escrito al redibujar.
@@ -61,9 +62,8 @@ class _RegisterViewState extends State<RegisterView> {
       return;
     }
     if (nombreController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Introduce tu nombre')),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Introduce tu nombre')));
       return;
     }
     // tryParse devuelve null si el texto no es un entero, sin lanzar un error.
@@ -96,9 +96,13 @@ class _RegisterViewState extends State<RegisterView> {
       debugPrint('Error al guardar perfil: ${e.code}: ${e.message}');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.code == 'permission-denied'
-            ? 'Firestore no permite guardar el perfil. Revisa sus reglas.'
-            : 'No se ha podido guardar el perfil. Inténtalo de nuevo.')),
+        SnackBar(
+          content: Text(
+            e.code == 'permission-denied'
+                ? 'Firestore no permite guardar el perfil. Revisa sus reglas.'
+                : 'No se ha podido guardar el perfil. Inténtalo de nuevo.',
+          ),
+        ),
       );
     } finally {
       if (mounted) setState(() => registrando = false);
@@ -201,13 +205,38 @@ class _RegisterViewState extends State<RegisterView> {
         body: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24),
-            child: ConstrainedBox(
+            child: Container(
               constraints: const BoxConstraints(maxWidth: 420),
+              padding: const EdgeInsets.all(28),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: const Color(0xFFFED7AA)),
+              ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text('Completa tu nombre y edad para continuar.'),
+                  const Icon(
+                    Icons.person_outline_rounded,
+                    size: 48,
+                    color: Color(0xFF9A3412),
+                  ),
+                  const SizedBox(height: 24),
+                  const Text(
+                    'Un toque personal',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF431407),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Completa tu nombre y edad para continuar.',
+                    textAlign: TextAlign.center,
+                  ),
                   const SizedBox(height: 20),
                   TextField(
                     controller: nombreController,
@@ -228,7 +257,9 @@ class _RegisterViewState extends State<RegisterView> {
                       foregroundColor: Colors.white,
                     ),
                     onPressed: registrando ? null : funGuardarPerfil,
-                    child: Text(registrando ? 'Guardando...' : 'Guardar perfil'),
+                    child: Text(
+                      registrando ? 'Guardando...' : 'Guardar perfil',
+                    ),
                   ),
                 ],
               ),
@@ -237,6 +268,7 @@ class _RegisterViewState extends State<RegisterView> {
         ),
       );
     }
+    // Sin perfil pendiente se muestra el formulario de crear una cuenta.
     return Scaffold(
       backgroundColor: const Color(0xFFFFF7ED),
       appBar: AppBar(

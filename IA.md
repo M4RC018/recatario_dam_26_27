@@ -45,3 +45,22 @@ El alumno pidió aprender paso a paso y no modificar código salvo petición exp
 - Se intentó manejar el navegador para probar el flujo; la herramienta falló al arrancar. No se documenta como una prueba superada.
 - A petición del alumno, el asistente actualizó README y esta bitácora y añadió comentarios explicativos a los archivos propios de la app. No cambió la lógica en esta tarea de documentación.
 - La integración de withConverter, pendiente en las primeras entradas históricas, ya está realizada. Falta probarla de extremo a extremo y poder explicarla sin depender de los comentarios.
+
+## 8 de octubre: organización de carpetas
+
+- A petición del alumno, se siguió la estructura del profesor: Perfil pasó a FbObjects y DataHolder a la raíz de lib.
+- Se actualizaron los imports y se prepararon Admins e insLib con .gitkeep. No se añadieron servicios ni componentes nuevos.
+- Se actualizó la explicación de carpetas en el README. La lógica de acceso y guardado se conserva.
+
+
+## 8 de octubre: splash, sesión y documentación
+
+- El asistente ajustó el diseño a petición del alumno y añadió protección mounted y alternativa visual si falla el GIF.
+- El alumno pidió escribir personalmente la lógica. Recibió explicación de currentUser, UID, get(), withConverter y la diferencia entre sesión persistente y DataHolder en memoria.
+- El alumno añadió al splash la comprobación de sesión y la lectura del perfil. Confirmó que se conserva la sesión tras detener y volver a ejecutar en navegador.
+- El asistente revisó el código y compiló la app web; no consiguió hacer la prueba visual porque falló la herramienta de navegador.
+- Las dos pruebas locales del registro pasaron en la comprobación anterior. La prueba heredada del contador no terminó. No prueban el recorrido real con Firebase.
+- A petición del alumno, se comentaron los archivos propios, se actualizó la documentación y se preparó el commit y push del trabajo de hoy. firebase_options.dart se conserva como archivo generado.
+- Pendientes identificados sin cambiar la lógica: error de lectura en splash, ruta de perfil ausente sin arguments: true y comprobación de nombre y edad al recuperar sesión.
+
+- Verificación del cierre: dos pruebas de registro superadas; análisis sin errores y con 14 avisos. No se repitió la prueba heredada del contador ni se realizó un recorrido Android.
