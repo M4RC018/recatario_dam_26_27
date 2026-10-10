@@ -1,3 +1,4 @@
+import 'package:recetario_dam_mry/insLib/theme/AppTheme.dart';
 import 'package:flutter/material.dart';
 import 'package:recetario_dam_mry/views/RegisterView.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -117,11 +118,11 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF7ED),
+      backgroundColor: AppColores.fondo,
       appBar: AppBar(
         title: const Text("RECETARIO"),
-        backgroundColor: const Color(0xFFFFF7ED),
-        foregroundColor: const Color(0xFF9A3412),
+        backgroundColor: AppColores.fondo,
+        foregroundColor: AppColores.principal,
         centerTitle: true,
         elevation: 0,
       ),
@@ -134,9 +135,16 @@ class _LoginViewState extends State<LoginView> {
               constraints: const BoxConstraints(maxWidth: 420),
               padding: const EdgeInsets.all(28),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: const Color(0xFFFED7AA)),
+                color: AppColores.tarjeta,
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(color: AppColores.suave),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x104F46E5),
+                    blurRadius: 32,
+                    offset: Offset(0, 12),
+                  ),
+                ],
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -145,7 +153,7 @@ class _LoginViewState extends State<LoginView> {
                   const Icon(
                     Icons.restaurant_menu_rounded,
                     size: 48,
-                    color: Color(0xFF9A3412),
+                    color: AppColores.principal,
                   ),
                   const SizedBox(height: 24),
 
@@ -154,7 +162,7 @@ class _LoginViewState extends State<LoginView> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 28,
-                      color: Color(0xFF431407),
+                      color: AppColores.oscuro,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -165,23 +173,23 @@ class _LoginViewState extends State<LoginView> {
                     controller: emailController,
                     decoration: InputDecoration(
                       labelText: "Correo electrónico",
-                      prefixIcon: const Icon(Icons.person),
+                      prefixIcon: const Icon(Icons.alternate_email_rounded),
                       filled: true,
-                      fillColor: const Color(0xFFFFF7ED),
-                      prefixIconColor: const Color(0xFF9A3412),
+                      fillColor: AppColores.fondo,
+                      prefixIconColor: AppColores.principal,
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Color(0xFFFED7AA)),
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(color: AppColores.suave),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(16),
                         borderSide: const BorderSide(
-                          color: Color(0xFF9A3412),
+                          color: AppColores.principal,
                           width: 2,
                         ),
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(16),
                       ),
                     ),
                   ),
@@ -195,21 +203,21 @@ class _LoginViewState extends State<LoginView> {
                       labelText: "Contraseña",
                       prefixIcon: const Icon(Icons.lock),
                       filled: true,
-                      fillColor: const Color(0xFFFFF7ED),
-                      prefixIconColor: const Color(0xFF9A3412),
+                      fillColor: AppColores.fondo,
+                      prefixIconColor: AppColores.principal,
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Color(0xFFFED7AA)),
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(color: AppColores.suave),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(16),
                         borderSide: const BorderSide(
-                          color: Color(0xFF9A3412),
+                          color: AppColores.principal,
                           width: 2,
                         ),
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(16),
                       ),
                     ),
                   ),
@@ -218,12 +226,12 @@ class _LoginViewState extends State<LoginView> {
 
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF9A3412),
+                      backgroundColor: AppColores.principal,
                       foregroundColor: Colors.white,
                       minimumSize: const Size.fromHeight(52),
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(16),
                       ),
                     ),
                     onPressed: entrando ? null : funClickLogin,
@@ -232,7 +240,7 @@ class _LoginViewState extends State<LoginView> {
 
                   TextButton(
                     style: TextButton.styleFrom(
-                      foregroundColor: const Color(0xFF9A3412),
+                      foregroundColor: AppColores.principal,
                     ),
                     onPressed: () {
                       Navigator.pushNamed(context, '/RegisterView');

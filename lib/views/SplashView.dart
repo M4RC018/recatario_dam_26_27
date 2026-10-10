@@ -1,3 +1,4 @@
+import 'package:recetario_dam_mry/insLib/theme/AppTheme.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:recetario_dam_mry/DataHolder.dart';
@@ -95,9 +96,16 @@ class _SplashViewState extends State<SplashView> {
               constraints: const BoxConstraints(maxWidth: 420),
               padding: const EdgeInsets.all(32),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: const Color(0xFFFED7AA)),
+                color: AppColores.tarjeta,
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(color: AppColores.suave),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x104F46E5),
+                    blurRadius: 32,
+                    offset: Offset(0, 12),
+                  ),
+                ],
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -106,7 +114,7 @@ class _SplashViewState extends State<SplashView> {
                   const Icon(
                     Icons.restaurant_menu_rounded,
                     size: 40,
-                    color: Color(0xFF9A3412),
+                    color: AppColores.principal,
                   ),
                   const SizedBox(height: 16),
                   const Text(
@@ -115,7 +123,7 @@ class _SplashViewState extends State<SplashView> {
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF431407),
+                      color: AppColores.oscuro,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -144,7 +152,7 @@ class _SplashViewState extends State<SplashView> {
                           child: Icon(
                             Icons.soup_kitchen_rounded,
                             size: 88,
-                            color: Color(0xFF9A3412),
+                            color: AppColores.principal,
                           ),
                         ),
                   ),
@@ -155,7 +163,7 @@ class _SplashViewState extends State<SplashView> {
                     child: LinearProgressIndicator(
                       value: progreso / 100,
                       minHeight: 8,
-                      backgroundColor: const Color(0xFFFED7AA),
+                      backgroundColor: AppColores.suave,
                     ),
                   ),
                   const SizedBox(height: 12),

@@ -64,3 +64,25 @@ El alumno pidió aprender paso a paso y no modificar código salvo petición exp
 - Pendientes identificados sin cambiar la lógica: error de lectura en splash, ruta de perfil ausente sin arguments: true y comprobación de nombre y edad al recuperar sesión.
 
 - Verificación del cierre: dos pruebas de registro superadas; análisis sin errores y con 14 avisos. No se repitió la prueba heredada del contador ni se realizó un recorrido Android.
+
+## 9 de octubre: cambio de diseño
+
+- A petición expresa del alumno, el asistente cambió la paleta a azul y violeta, añadió sombras suaves y ajustó bordes e iconos.
+- Los colores compartidos se organizaron en insLib/theme/AppTheme.dart siguiendo la estructura del profesor.
+- Se conservaron las rutas y la lógica existente. ProfileView sigue en construcción: solo se cambió su presentación.
+
+## 10 de octubre: barra de navegación
+
+- A petición del alumno, se adaptó InsBotBarStyle1 al patrón StatelessWidget del profesor, con índice recibido por constructor y navegación por rutas.
+- Se conectaron Home (0) y Perfil (2). Explorar queda deshabilitada hasta crear su pantalla. No se añadieron badges ni guardado de perfil.
+
+
+## 10 de octubre: aprendizaje del perfil y cierre del avance
+
+- El alumno escribió controladores, dispose, campos, validaciones y botón con orientación paso a paso. Pidió no recibir el código completo salvo petición expresa.
+- Se explicó el ciclo de vida, la liberación de recursos, etiquetas de campos, tryParse y navegación por índices.
+- El alumno autorizó adaptar la barra al patrón del profesor y quitar los break. El asistente realizó esos cambios y conectó Home y Perfil.
+- En el cierre solicitado, el asistente añadió comentarios y actualizó el README según el código real. No corrigió por su cuenta la validación invertida del nombre ni añadió guardado.
+- Este commit incluye solo archivos nuevos o modificados respecto al commit anterior, también el cambio de diseño del día 9 pendiente de versionar.
+
+Validación del cierre del 10 de octubre: flutter analyze sin errores, con 16 avisos de estilo/importaciones. Se intentó dos veces la suite de registro: en la repetición pasó campos vacíos, pero la prueba de contraseñas distintas no terminó. No se declara la suite superada ni se realizaron pruebas visuales Android/web en este cierre.

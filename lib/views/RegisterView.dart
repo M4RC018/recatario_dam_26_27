@@ -1,3 +1,4 @@
+import 'package:recetario_dam_mry/insLib/theme/AppTheme.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -200,7 +201,7 @@ class _RegisterViewState extends State<RegisterView> {
     // Este modo muestra nombre y edad. El otro muestra correo y contraseñas.
     if (completandoPerfil) {
       return Scaffold(
-        backgroundColor: const Color(0xFFFFF7ED),
+        backgroundColor: AppColores.fondo,
         appBar: AppBar(title: const Text('Completa tu perfil')),
         body: Center(
           child: SingleChildScrollView(
@@ -209,9 +210,16 @@ class _RegisterViewState extends State<RegisterView> {
               constraints: const BoxConstraints(maxWidth: 420),
               padding: const EdgeInsets.all(28),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: const Color(0xFFFED7AA)),
+                color: AppColores.tarjeta,
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(color: AppColores.suave),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x104F46E5),
+                    blurRadius: 32,
+                    offset: Offset(0, 12),
+                  ),
+                ],
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -220,7 +228,7 @@ class _RegisterViewState extends State<RegisterView> {
                   const Icon(
                     Icons.person_outline_rounded,
                     size: 48,
-                    color: Color(0xFF9A3412),
+                    color: AppColores.principal,
                   ),
                   const SizedBox(height: 24),
                   const Text(
@@ -229,7 +237,7 @@ class _RegisterViewState extends State<RegisterView> {
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF431407),
+                      color: AppColores.oscuro,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -253,7 +261,7 @@ class _RegisterViewState extends State<RegisterView> {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF9A3412),
+                      backgroundColor: AppColores.principal,
                       foregroundColor: Colors.white,
                     ),
                     onPressed: registrando ? null : funGuardarPerfil,
@@ -270,11 +278,11 @@ class _RegisterViewState extends State<RegisterView> {
     }
     // Sin perfil pendiente se muestra el formulario de crear una cuenta.
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF7ED),
+      backgroundColor: AppColores.fondo,
       appBar: AppBar(
         title: const Text("RECETARIO"),
-        backgroundColor: const Color(0xFFFFF7ED),
-        foregroundColor: const Color(0xFF9A3412),
+        backgroundColor: AppColores.fondo,
+        foregroundColor: AppColores.principal,
         centerTitle: true,
         elevation: 0,
       ),
@@ -286,9 +294,16 @@ class _RegisterViewState extends State<RegisterView> {
               constraints: const BoxConstraints(maxWidth: 420),
               padding: const EdgeInsets.all(28),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: const Color(0xFFFED7AA)),
+                color: AppColores.tarjeta,
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(color: AppColores.suave),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x104F46E5),
+                    blurRadius: 32,
+                    offset: Offset(0, 12),
+                  ),
+                ],
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -297,7 +312,7 @@ class _RegisterViewState extends State<RegisterView> {
                   const Icon(
                     Icons.restaurant_menu_rounded,
                     size: 48,
-                    color: Color(0xFF9A3412),
+                    color: AppColores.principal,
                   ),
                   const SizedBox(height: 24),
 
@@ -306,7 +321,7 @@ class _RegisterViewState extends State<RegisterView> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 28,
-                      color: Color(0xFF431407),
+                      color: AppColores.oscuro,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -320,23 +335,23 @@ class _RegisterViewState extends State<RegisterView> {
                     autocorrect: false,
                     decoration: InputDecoration(
                       labelText: "Correo electrónico",
-                      prefixIcon: const Icon(Icons.person),
+                      prefixIcon: const Icon(Icons.alternate_email_rounded),
                       filled: true,
-                      fillColor: const Color(0xFFFFF7ED),
-                      prefixIconColor: const Color(0xFF9A3412),
+                      fillColor: AppColores.fondo,
+                      prefixIconColor: AppColores.principal,
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Color(0xFFFED7AA)),
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(color: AppColores.suave),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(16),
                         borderSide: const BorderSide(
-                          color: Color(0xFF9A3412),
+                          color: AppColores.principal,
                           width: 2,
                         ),
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(16),
                       ),
                     ),
                   ),
@@ -351,21 +366,21 @@ class _RegisterViewState extends State<RegisterView> {
                       labelText: "Contraseña",
                       prefixIcon: const Icon(Icons.lock),
                       filled: true,
-                      fillColor: const Color(0xFFFFF7ED),
-                      prefixIconColor: const Color(0xFF9A3412),
+                      fillColor: AppColores.fondo,
+                      prefixIconColor: AppColores.principal,
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Color(0xFFFED7AA)),
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(color: AppColores.suave),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(16),
                         borderSide: const BorderSide(
-                          color: Color(0xFF9A3412),
+                          color: AppColores.principal,
                           width: 2,
                         ),
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(16),
                       ),
                     ),
                   ),
@@ -380,18 +395,18 @@ class _RegisterViewState extends State<RegisterView> {
                       labelText: "Repetir contraseña",
                       prefixIcon: const Icon(
                         Icons.lock_outline,
-                        color: Color(0xFF9A3412),
+                        color: AppColores.principal,
                       ),
                       filled: true,
-                      fillColor: const Color(0xFFFFF7ED),
+                      fillColor: AppColores.fondo,
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Color(0xFFFED7AA)),
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(color: AppColores.suave),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(16),
                         borderSide: const BorderSide(
-                          color: Color(0xFF9A3412),
+                          color: AppColores.principal,
                           width: 2,
                         ),
                       ),
@@ -402,12 +417,12 @@ class _RegisterViewState extends State<RegisterView> {
 
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF9A3412),
+                      backgroundColor: AppColores.principal,
                       foregroundColor: Colors.white,
                       minimumSize: const Size.fromHeight(52),
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(16),
                       ),
                     ),
                     onPressed: registrando ? null : funClickRegistro,

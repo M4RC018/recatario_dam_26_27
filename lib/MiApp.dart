@@ -1,6 +1,8 @@
+import 'package:recetario_dam_mry/insLib/theme/AppTheme.dart';
 import 'package:flutter/material.dart';
 import 'package:recetario_dam_mry/views/HomeView.dart';
 import 'package:recetario_dam_mry/views/LoginView.dart';
+import 'package:recetario_dam_mry/views/ProfileView.dart';
 import 'package:recetario_dam_mry/views/RegisterView.dart';
 import 'package:recetario_dam_mry/views/SplashView.dart';
 
@@ -10,31 +12,41 @@ class MiApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: "Recetario",
-      // Estilo común de la app; insLib queda preparada para extraerlo como en clase.
+      // Colores compartidos en insLib/theme, como en el proyecto de clase.
       theme: ThemeData(
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF9A3412)),
-        scaffoldBackgroundColor: const Color(0xFFFFF7ED),
+        textTheme: const TextTheme(
+          bodyMedium: TextStyle(color: AppColores.oscuro, height: 1.5),
+          titleLarge: TextStyle(
+            color: AppColores.oscuro,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppColores.principal,
+          primary: AppColores.principal,
+        ),
+        scaffoldBackgroundColor: AppColores.fondo,
         appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFFFFF7ED),
-          foregroundColor: Color(0xFF9A3412),
+          backgroundColor: AppColores.fondo,
+          foregroundColor: AppColores.principal,
           centerTitle: true,
           elevation: 0,
         ),
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor: const Color(0xFFFFF7ED),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          fillColor: AppColores.fondo,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Color(0xFFFED7AA)),
+            borderRadius: BorderRadius.circular(16),
+            borderSide: const BorderSide(color: AppColores.suave),
           ),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             minimumSize: const Size.fromHeight(52),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(16),
             ),
           ),
         ),
@@ -50,6 +62,8 @@ class MiApp extends StatelessWidget {
           // arguments: true pide los datos personales; sin argumento crea cuenta.
           completarPerfil: ModalRoute.of(context)?.settings.arguments == true,
         ),
+        // Ruta del formulario accesible desde la barra, aún sin guardado.
+        "/ProfileView": (context) => ProfileView(),
       },
     );
   }

@@ -1,5 +1,7 @@
+import 'package:recetario_dam_mry/insLib/theme/AppTheme.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:recetario_dam_mry/insLib/bot_bars/InsBotBarStyle1.dart';
 
 import '../DataHolder.dart';
 
@@ -36,7 +38,7 @@ class _HomeviewState extends State<Homeview> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFFFF7ED),
+      backgroundColor: AppColores.fondo,
       appBar: AppBar(
         title: const Text('Recetario'),
         actions: [
@@ -54,9 +56,16 @@ class _HomeviewState extends State<Homeview> {
             margin: const EdgeInsets.all(24),
             constraints: const BoxConstraints(maxWidth: 520),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: const Color(0xFFFED7AA)),
+              color: AppColores.tarjeta,
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(color: AppColores.suave),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x104F46E5),
+                  blurRadius: 32,
+                  offset: Offset(0, 12),
+                ),
+              ],
             ),
             // Si no hay nombre, muestra un saludo genérico sin forzar un null.
             child: Text(
@@ -68,12 +77,14 @@ class _HomeviewState extends State<Homeview> {
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF9A3412),
+                color: AppColores.principal,
               ),
             ),
           ),
         ),
       ),
+      // Recetas corresponde al índice 0; la barra permite abrir el perfil.
+      bottomNavigationBar: const InsBotBarStyle1(iBarIndex: 0),
     );
   }
 }

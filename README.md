@@ -2,7 +2,7 @@
 
 Aplicación de recetas desarrollada con Flutter y Firebase para el proyecto de 2.º de DAM.
 
-**Estado documentado: 8 de octubre de 2026.** Proyecto en desarrollo. Actualmente implementa el acceso, el registro y el perfil del usuario; todavía no permite gestionar recetas. Entrega de la fase 1: 16 de octubre de 2026.
+**Estado documentado: 10 de octubre de 2026.** Proyecto en desarrollo. Actualmente implementa el acceso, el registro y el perfil del usuario; todavía no permite gestionar recetas. Entrega de la fase 1: 16 de octubre de 2026.
 
 ## 1. Tecnologías
 
@@ -26,10 +26,12 @@ lib/
   Admins/                   Administradores de servicios (preparada).
   FbObjects/
     Perfil.dart             Modelo y conversiones de datos de Firestore.
-  insLib/                   Componentes y estilos reutilizables (preparada).
+  insLib/
+    theme/AppTheme.dart     Colores compartidos azul y violeta.
+    bot_bars/InsBotBarStyle1.dart  Barra compartida de tres destinos.
   views/
     SplashView.dart         Imagen URL, progreso y recuperación del perfil.
-    ProfileView.dart        Reservada; formulario aún dentro del registro.
+    ProfileView.dart        Campos y validaciones en construcción; sin guardado.
     LoginView.dart          Acceso y comprobación del perfil.
     RegisterView.dart       Registro y formulario de nombre y edad.
     HomeView.dart           Pantalla de bienvenida provisional.
@@ -42,7 +44,7 @@ android/, ios/, macos/, web/, windows/
                             Proyectos y configuración de plataformas.
 ```
 
-La estructura sigue el ejemplo de clase: `views` contiene las pantallas, `FbObjects` los modelos de Firestore y `DataHolder.dart` comparte los datos desde la raíz de `lib`. `Admins` está preparada para administradores de servicios e `insLib` para componentes y estilos reutilizables. Las carpetas preparadas incluyen `.gitkeep` para conservarlas en el repositorio. Las consultas todavía están dentro de las vistas; crear administradores de datos sigue pendiente.
+La estructura sigue el ejemplo de clase: `views` contiene las pantallas, `FbObjects` los modelos de Firestore y `DataHolder.dart` comparte los datos desde la raíz de `lib`. `Admins` está preparada para administradores de servicios e `insLib` contiene el tema y la barra reutilizable. Las carpetas preparadas incluyen `.gitkeep` para conservarlas en el repositorio. Las consultas todavía están dentro de las vistas; crear administradores de datos sigue pendiente.
 
 ## 3. Arranque en un equipo limpio
 
@@ -170,8 +172,9 @@ El modelo y `toFirestore()` solo incluyen nombre y edad. El correo está disponi
 | `/LoginView` | LoginView | Ninguno |
 | `/RegisterView` | RegisterView | `true` solicita completar perfil |
 | `/HomeView` | Homeview | Ninguno |
+| `/ProfileView` | ProfileView | Ninguno |
 
-Las rutas están declaradas en `MiApp`. El enlace de registro utiliza `Navigator.pushNamed(context, '/RegisterView')`. El argumento `true` selecciona el formulario de perfil. La separación en una pantalla ProfileView está pospuesta; el archivo creado está vacío y no participa en las rutas.
+Las rutas están declaradas en `MiApp`. El enlace de registro utiliza `Navigator.pushNamed(context, '/RegisterView')`. El argumento `true` selecciona el formulario de perfil. La separación en una pantalla ProfileView está pospuesta; ProfileView ya participa en las rutas y muestra campos y botón, pero aún no guarda; el formulario funcional sigue en RegisterView.
 
 Los controladores de texto se liberan con `dispose()`. Las consultas actuales son puntuales (`get` y `set`), sin suscripciones que cancelar. El cierre de sesión llama a `signOut()`, limpia `perfilUsuario` y usa `pushNamedAndRemoveUntil` para retirar las rutas anteriores. Su funcionamiento completo en Android y navegador sigue pendiente de prueba manual.
 
@@ -294,3 +297,21 @@ Abrir http://localhost:8080 en el mismo navegador y perfil. Iniciar sesión, det
 - La compilación web del 8 de octubre terminó correctamente antes de la última incorporación del alumno a la consulta del perfil. El control automatizado del navegador falló al iniciar; no se presenta como prueba visual superada.
 
 Validación tras actualizar comentarios y documentación: las dos pruebas de register_view_test.dart pasan; flutter analyze no detecta errores, pero informa 14 avisos de estilo e importaciones. La prueba antigua del contador sigue pendiente de resolver y no se ha repetido en este cierre.
+
+## 13. Avance del 9 y 10 de octubre
+
+- El 9 de octubre se renovó el diseño a petición del alumno: paleta azul y violeta, sombras suaves y colores compartidos en insLib/theme/AppTheme.dart.
+- El 10 de octubre se construyó el formulario de ProfileView: controladores de nombre y edad, dispose, avisos de validación y botón conectado a funGuardarPerfil.
+- La barra sigue el patrón del profesor: StatelessWidget, índice recibido por constructor y navegación por rutas. Home usa índice 0 y Perfil índice 2. Explorar (1) está deshabilitada hasta crear la cuadrícula. Los casos del switch no necesitan break en la versión actual de Dart.
+- ProfileView se puede abrir desde Home y volver a Home por la barra. Registro, login y splash todavía no redirigen a esta pantalla; mantienen su flujo anterior.
+
+### Pendientes concretos del formulario
+
+- La condición del nombre usa isNotEmpty: actualmente muestra el aviso con nombre escrito. Cambiarla a isEmpty y salir de la función tras el aviso.
+- funGuardarPerfil todavía no escribe en Firestore ni actualiza DataHolder. Su nombre describe la intención, no una funcionalidad terminada.
+- guardando permanece en false y todavía no bloquea ninguna petición real.
+- El usuario se captura al crear el State; conviene consultarlo dentro de la función para usar la sesión actual.
+- Falta precargar el perfil existente, solicitar teclado numérico y adaptar el formulario a teclado/pantallas pequeñas.
+- La barra tiene tres destinos visuales, pero solo dos habilitados y aún no presenta lista ni cuadrícula de Firestore. No acredita el bloque 5 completo.
+
+Validación del cierre del 10 de octubre: flutter analyze sin errores, con 16 avisos de estilo/importaciones. Se intentó dos veces la suite de registro: en la repetición pasó campos vacíos, pero la prueba de contraseñas distintas no terminó. No se declara la suite superada ni se realizaron pruebas visuales Android/web en este cierre.
